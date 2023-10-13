@@ -10,7 +10,7 @@ import React from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { themeSettings } from "../../ticket-booking-admin/src/theme";
+import { themeSettings } from "../src/theme";
 import Topbar from "./global/Topbar";
 import BookingOrder from "./scenes/BookingOrder";
 import BookingSearch from "./scenes/BookingSearch";

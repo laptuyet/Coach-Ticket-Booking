@@ -45,7 +45,7 @@ const registerSchema = yup.object().shape({
   username: yup
     .string()
     .required(messages.common.required)
-    .test("username", "Tài khoản đã tồn tại", async (value) => {
+    .test("username", messages.username.isReady, async (value) => {
       const isAvailable = await checkExistUsernameDebounced(value);
       return !isAvailable;
     }),
@@ -53,14 +53,14 @@ const registerSchema = yup.object().shape({
   rePassword: yup
     .string()
     .required(messages.common.required)
-    .test("password", "Mật khẩu không khớp", (value, ctx) => {
+    .test("password", messages.password.notMatched, (value, ctx) => {
       return value === ctx.parent.password;
     }),
   email: yup
     .string()
     .required(messages.common.required)
     .matches(APP_CONSTANTS.EMAIL_REGEX, messages.email.invalid)
-    .test("email", "Địa chỉ email đã được sử dụng", async (value) => {
+    .test("email", messages.email.isReady, async (value) => {
       const isAvailable = await checkExistEmailDebounced(value);
       return !isAvailable;
     }),
@@ -68,7 +68,7 @@ const registerSchema = yup.object().shape({
     .string()
     .required(messages.common.required)
     .matches(APP_CONSTANTS.PHONE_REGEX, messages.phone.invalid)
-    .test("phone", "Số điện thoại đã được sử dụng", async (value) => {
+    .test("phone", messages.phone.isReady, async (value) => {
       const isAvailable = await checkExistPhoneDebounced(value);
       return !isAvailable;
     }),
@@ -92,7 +92,7 @@ const Register = () => {
     registerMutation.mutate(newValues, {
       onSuccess: (data) => {
         console.log(data.token);
-        handleToast("success", "Đăng ký tài khoản thành công");
+        handleToast("success", messages.signup.signupSuccess );
 
         navigate("/login");
       },

@@ -28,7 +28,7 @@ const initialValues = {
   username: "",
   password: "",
 };
-
+  
 const checkActiveStatusDebounced = debounce(authApi.checkActiveStatus, 500);
 
 const checkExistUsernameDebounced = debounce(authApi.checkExistUsername, 500);
@@ -36,17 +36,17 @@ const checkExistUsernameDebounced = debounce(authApi.checkExistUsername, 500);
 const authSchema = yup.object().shape({
   username: yup
     .string()
-    .required(messages.common.required)
+    .required(messages.username.required)
     .test(
       "username",
-      "Tài khoản không tồn tại hoặc đã bị khóa",
+      messages.username.wrong,
       async (value) => {
         const isAvailable = await checkExistUsernameDebounced(value);
         const isActive = await checkActiveStatusDebounced(value);
         return isAvailable && isActive;
       }
     ),
-  password: yup.string().required(messages.common.required),
+  password: yup.string().required(messages.password.required),
 });
 
 const Login = () => {
@@ -65,7 +65,7 @@ const Login = () => {
       onSuccess: (data) => {
         const accessToken = data.token;
         localStorage.setItem("accessToken", accessToken);
-        handleToast("success", "Đăng nhập thành công");
+        handleToast("success", messages.common.loginSuccess);
         // get user info
         localStorage.setItem("loggedInUsername", values.username);
 
@@ -76,7 +76,7 @@ const Login = () => {
       onError: (error) => {
         console.log(error);
         if (error.response?.status === 403) {
-          handleToast("error", "Mật khẩu sai");
+          handleToast("error", messages.password.wrong);
         } else handleToast("error", error.response?.data?.message);
       },
     });

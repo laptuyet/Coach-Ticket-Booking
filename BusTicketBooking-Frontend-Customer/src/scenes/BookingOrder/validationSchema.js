@@ -14,7 +14,7 @@ export default [
         bookingType: yup.string().notRequired()
     }),
     yup.object().shape({
-        seatNumber: yup.array().required(msg.autocomplete.required).min(1, "Chọn ít nhất 1 chỗ"),
+        seatNumber: yup.array().required(msg.autocomplete.required).min(1, msg.autocomplete.min),
     }),
     yup.object().shape({
         pickUpAddress: yup.string().required(msg.common.required),

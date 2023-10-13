@@ -14,6 +14,7 @@ import validationSchema from "../validationSchema";
 import * as bookingApi from "../../../queries/booking/ticketQueries";
 import { useMutation } from "@tanstack/react-query";
 import { handleToast } from "../../../utils/helpers";
+import { messages as msg } from "../../../utils/validationMessages";
 // import Header from "../../../components/Header";
 
 const initialValues = {
@@ -122,7 +123,7 @@ const StepperBooking = () => {
     createMutation.mutate(newValues, {
       onSuccess: () => {
         actions.resetForm();
-        handleToast("success", "Add new Bookings successfully");
+        handleToast("success", msg.ticketBooking.success);
       },
       onError: (error) => {
         console.log(error);
