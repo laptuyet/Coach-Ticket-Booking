@@ -17,7 +17,7 @@ import * as userApi from "../user/userQueries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useLogin from "../../utils/useLogin";
 import { parse, format } from "date-fns";
-import { debounce } from "../../../../ticket-booking-admin/src/utils/debounce";
+import { debounce } from "../../utils/debounce";
 import * as yup from "yup";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { Formik } from "formik";
@@ -27,7 +27,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import { LoadingButton } from "@mui/lab";
-import { handleToast } from "../../../../ticket-booking-admin/src/utils/helpers";
+import { handleToast } from "../../utils/helpers";
 
 const initialValues = {
   username: "",

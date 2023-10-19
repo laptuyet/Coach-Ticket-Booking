@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const http = axios.create({
-    baseURL: 'https://bus-ticket-booking-javaapp.azurewebsites.net/api/v1/',
+    baseURL: 'https://coach-ticket-booking.onrender.com/api/v1/',
     timeout: 10000, // 10s
     headers: {
         "Content-Type": "application/json",
