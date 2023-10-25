@@ -18,6 +18,7 @@ import Header from "../../../components/Header";
 import { debounce } from "../../../utils/debounce";
 import { handleToast } from "../../../utils/helpers";
 import * as coachApi from "../../bus/coachQueries";
+import { messages as msg } from "../../../utils/validationMessages";
 
 const initialValues = {
   id: 0,
@@ -41,8 +42,8 @@ const coachScheme = yup.object().shape({
   id: yup.number().notRequired(),
   name: yup
     .string()
-    .required("Required")
-    .test("name", "Name is already used", async (value, ctx) => {
+    .required(msg.common.required)
+    .test("name", msg.coach.nameReady, async (value, ctx) => {
       const isAvailable = await checkDuplicateNameDebounced(
         ctx.parent.isEditMode ? "EDIT" : "ADD",
         ctx.parent.id,
@@ -51,13 +52,13 @@ const coachScheme = yup.object().shape({
       );
       return isAvailable;
     }),
-  capacity: yup.number().positive("Capacity must be positive"),
+  capacity: yup.number().positive(msg.coach.capacityPos),
   licensePlate: yup
     .string()
-    .required("Required")
+    .required(msg.common.required)
     .test(
       "licensePlate",
-      "License plate is already used",
+      msg.coach.licensePlateReady,
       async (value, ctx) => {
         const isAvailable = await checkDuplicateLicensePlateDebounced(
           ctx.parent.isEditMode ? "EDIT" : "ADD",
@@ -68,7 +69,7 @@ const coachScheme = yup.object().shape({
         return isAvailable;
       }
     ),
-  coachType: yup.string().required("Required").default("BED"),
+  coachType: yup.string().required(msg.common.required).default("BED"),
   isEditMode: yup.boolean().default(true),
 });
 
@@ -101,7 +102,7 @@ const CoachForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new coach successfully");
+          handleToast("success", msg.coach.success);
         },
         onError: (error) => {
           console.log(error);
@@ -112,7 +113,7 @@ const CoachForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["coaches", coachId], data);
-          handleToast("success", "Update coach successfully");
+          handleToast("success", msg.coach.updateSuccess);
         },
         onError: (error) => {
           console.log(error);

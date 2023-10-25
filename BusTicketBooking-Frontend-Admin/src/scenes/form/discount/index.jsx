@@ -23,6 +23,7 @@ import { tokens } from "../../../theme";
 import { debounce } from "../../../utils/debounce";
 import { handleToast } from "../../../utils/helpers";
 import * as discountApi from "../../discount/discountQueries";
+import { messages as msg } from "../../../utils/validationMessages";
 
 const initialValues = {
   id: 0,
@@ -66,8 +67,8 @@ const discountScheme = yup.object().shape({
   id: yup.number().notRequired(),
   code: yup
     .string()
-    .required("Required")
-    .test("code", "Code is already used", async (value, ctx) => {
+    .required(msg.common.required)
+    .test("code", msg.discount.codeReady, async (value, ctx) => {
       const isAvailable = await checkDuplicateCodeDebounced(
         ctx.parent.isEditMode ? "EDIT" : "ADD",
         ctx.parent.id,
@@ -76,9 +77,9 @@ const discountScheme = yup.object().shape({
       );
       return isAvailable;
     }),
-  amount: yup.number().positive("Amount must be positive"),
-  startDateTime: yup.date().required("Required"),
-  endDateTime: yup.date().required("Required"),
+  amount: yup.number().positive(msg.discount.amountPos),
+  startDateTime: yup.date().required(msg.common.required),
+  endDateTime: yup.date().required(msg.common.required),
   description: yup.string().notRequired(),
   isEditMode: yup.boolean().default(true),
 });
@@ -116,7 +117,7 @@ const DiscountForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new discount successfully");
+          handleToast("success", msg.discount.success);
         },
         onError: (error) => {
           console.log(error);
@@ -127,7 +128,7 @@ const DiscountForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["discounts", discountId], data);
-          handleToast("success", "Update discount successfully");
+          handleToast("success", msg.discount.updateSuccess);
         },
         onError: (error) => {
           console.log(error);

@@ -34,6 +34,7 @@ import { APP_CONSTANTS } from "../../../utils/appContants";
 import { debounce } from "../../../utils/debounce";
 import { handleToast } from "../../../utils/helpers";
 import * as userApi from "../../user/userQueries";
+import { messages as msg } from "../../../utils/validationMessages";
 
 const initialValues = {
   username: "",
@@ -68,8 +69,8 @@ const userScheme = yup.object().shape({
     then: () =>
       yup
         .string()
-        .required("Required")
-        .test("username", "Username is already used", async (value) => {
+        .required(msg.common.required)
+        .test("username", msg.users.usernameReady, async (value) => {
           const isAvailable = await checkDuplicateUsernameDebounced(
             "ADD",
             value,
@@ -80,14 +81,14 @@ const userScheme = yup.object().shape({
         }),
     otherwise: () => yup.string().notRequired(),
   }),
-  password: yup.string().required("Required"),
-  firstName: yup.string().required("Required"),
-  lastName: yup.string().required("Required"),
+  password: yup.string().required(msg.common.required),
+  firstName: yup.string().required(msg.common.required),
+  lastName: yup.string().required(msg.common.required),
   email: yup
     .string()
-    .required("Required")
-    .matches(APP_CONSTANTS.EMAIL_REGEX, "Invalid Email")
-    .test("email", "Email is already used", async (value, ctx) => {
+    .required(msg.common.required)
+    .matches(APP_CONSTANTS.EMAIL_REGEX, msg.common.emailInvalid)
+    .test("email", msg.common.emailAlready, async (value, ctx) => {
       const isAvailable = await checkDuplicateEmailDebounced(
         ctx.parent.isEditMode ? "EDIT" : "ADD",
         ctx.parent.username,
@@ -98,9 +99,9 @@ const userScheme = yup.object().shape({
     }),
   phone: yup
     .string()
-    .matches(APP_CONSTANTS.PHONE_REGEX, "Invalid phone number")
-    .required("Required")
-    .test("phone", "Phone is already used", async (value, ctx) => {
+    .matches(APP_CONSTANTS.PHONE_REGEX, msg.common.phoneInvalid)
+    .required(msg.common.required)
+    .test("phone", msg.common.phoneAlready, async (value, ctx) => {
       const isAvailable = await checkDuplicatePhoneDebounced(
         ctx.parent.isEditMode ? "EDIT" : "ADD",
         ctx.parent.username,
@@ -111,9 +112,9 @@ const userScheme = yup.object().shape({
     }),
   dob: yup
     .date()
-    .max(new Date(), "Your day of birth must be before current date")
-    .required("Required")
-    .test("dob", "Not old enough to work (age >= 18)", (value) => {
+    .max(new Date(),msg.common.dobBeforeCurrent)
+    .required(msg.common.required)
+    .test("dob", msg.common.age18, (value) => {
       // nhớ chỉ check tuổi đi làm đổi với nhân viên, khách thì kemeno
       const currentDate = new Date();
       const dob = new Date(value);
@@ -158,7 +159,7 @@ const UserForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new user successfully");
+          handleToast("success", msg.users.success);
         },
         onError: (error) => {
           console.log(error);
@@ -169,7 +170,7 @@ const UserForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["users", username], data);
-          handleToast("success", "Update user successfully");
+          handleToast("success", msg.users.updateSuccess);
         },
         onError: (error) => {
           console.log(error);

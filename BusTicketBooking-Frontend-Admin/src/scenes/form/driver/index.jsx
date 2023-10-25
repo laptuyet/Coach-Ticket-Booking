@@ -34,6 +34,7 @@ import { APP_CONSTANTS } from "../../../utils/appContants";
 import { debounce } from "../../../utils/debounce";
 import { handleToast } from "../../../utils/helpers";
 import * as driverApi from "../../driver/driverQueries";
+import { messages as msg } from "../../../utils/validationMessages";
 
 const initialValues = {
   id: "",
@@ -64,13 +65,13 @@ const checkDuplicateLicenseNumberDebounced = debounce(
 
 const userScheme = yup.object().shape({
   id: yup.number().notRequired(),
-  firstName: yup.string().required("Required"),
-  lastName: yup.string().required("Required"),
+  firstName: yup.string().required(msg.common.required),
+  lastName: yup.string().required(msg.common.required),
   email: yup
     .string()
-    .required("Required")
-    .matches(APP_CONSTANTS.EMAIL_REGEX, "Invalid Email")
-    .test("email", "Email is already used", async (value, ctx) => {
+    .required(msg.common.required)
+    .matches(APP_CONSTANTS.EMAIL_REGEX, msg.common.emailInvalid)
+    .test("email", msg.common.emailAlready, async (value, ctx) => {
       const isAvailable = await checkDuplicateEmailDebounced(
         ctx.parent.isEditMode ? "EDIT" : "ADD",
         ctx.parent.id,
@@ -81,9 +82,9 @@ const userScheme = yup.object().shape({
     }),
   phone: yup
     .string()
-    .matches(APP_CONSTANTS.PHONE_REGEX, "Invalid phone number")
-    .required("Required")
-    .test("phone", "Phone is already used", async (value, ctx) => {
+    .matches(APP_CONSTANTS.PHONE_REGEX, msg.common.phoneInvalid)
+    .required(msg.common.required)
+    .test("phone", msg.common.phoneAlready, async (value, ctx) => {
       const isAvailable = await checkDuplicatePhoneDebounced(
         ctx.parent.isEditMode ? "EDIT" : "ADD",
         ctx.parent.id,
@@ -94,9 +95,9 @@ const userScheme = yup.object().shape({
     }),
   dob: yup
     .date()
-    .max(new Date(), "Your day of birth must be before current date")
-    .required("Required")
-    .test("dob", "Not old enough to work (age >= 18)", (value) => {
+    .max(new Date(), msg.common.dobBeforeCurrent)
+    .required(msg.common.required)
+    .test("dob", msg.common.age18, (value) => {
       // nhớ chỉ check tuổi đi làm đổi với nhân viên, khách thì kemeno
       const currentDate = new Date();
       const dob = new Date(value);
@@ -107,10 +108,10 @@ const userScheme = yup.object().shape({
   address: yup.string().default(""),
   licenseNumber: yup
     .string()
-    .required("Required")
+    .required(msg.common.required)
     .test(
       "licenseNumber",
-      "License Number is already used",
+      msg.driver.licenseReady,
       async (value, ctx) => {
         const isAvailable = await checkDuplicateLicenseNumberDebounced(
           ctx.parent.isEditMode ? "EDIT" : "ADD",
@@ -156,7 +157,7 @@ const DriverForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new driver successfully");
+          handleToast("success", msg.driver.success);
         },
         onError: (error) => {
           console.log(error);
@@ -167,7 +168,7 @@ const DriverForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["users", driverId], data);
-          handleToast("success", "Update driver successfully");
+          handleToast("success", msg.driver.updateSuccess);
         },
         onError: (error) => {
           console.log(error);

@@ -30,6 +30,7 @@ import * as discountApi from "../../discount/discountQueries";
 import * as driverApi from "../../driver/driverQueries";
 import * as provinceApi from "../../global/provinceQueries";
 import * as tripApi from "../../trip/tripQueries";
+import { messages as msg } from "../../../utils/validationMessages";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -53,23 +54,23 @@ const initialValues = {
 
 const tripSchema = yup.object().shape({
   id: yup.number().notRequired(),
-  driver: yup.object().required("Required"),
-  coach: yup.object().required("Required"),
+  driver: yup.object().required(msg.common.required),
+  coach: yup.object().required(msg.common.required),
   source: yup
     .object()
-    .required("Required")
-    .test("source", "Source is the same as Destination", (value, ctx) => {
+    .required(msg.common.required)
+    .test("source", msg.trip.soureSame, (value, ctx) => {
       return value.id !== ctx.parent.destination.id;
     }),
   destination: yup
     .object()
-    .required("Required")
-    .test("destination", "Destination is the same as Source", (value, ctx) => {
+    .required(msg.common.required)
+    .test("destination", msg.trip.destinationSame, (value, ctx) => {
       return value.id !== ctx.parent.source.id;
     }),
   discount: yup.object().notRequired(),
-  price: yup.number().positive("Price must be positive").default(1),
-  departureDateTime: yup.string().required("Required"),
+  price: yup.number().positive(msg.trip.pricePos).default(1),
+  departureDateTime: yup.string().required(msg.common.required),
   duration: yup.number().notRequired(),
   isEditMode: yup.boolean().default(true),
 });
@@ -175,7 +176,7 @@ const TripForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new trip successfully");
+          handleToast("success", msg.trip.success);
         },
         onError: (error) => {
           console.log(error);
@@ -186,7 +187,7 @@ const TripForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["trips", tripId], data);
-          handleToast("success", "Update trip successfully");
+          handleToast("success", msg.trip.updateSuccess);
         },
         onError: (error) => {
           console.log(error);

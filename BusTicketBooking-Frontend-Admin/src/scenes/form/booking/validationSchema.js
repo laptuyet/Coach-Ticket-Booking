@@ -1,55 +1,56 @@
 import * as yup from 'yup'
 import { APP_CONSTANTS } from "../../../utils/appContants"
 import { isAfter, parse } from 'date-fns'
+import { messages as msg } from '../../../utils/validationMessages'
 
 export default [
     yup.object().shape({
-        trip: yup.object().required("Required"),
-        source: yup.object().required("Required"),
-        destination: yup.object().required("Required"),
-        from: yup.date().required("Required"),
-        to: yup.date().required("Required"),
+        trip: yup.object().required(msg.common.required),
+        source: yup.object().required(msg.required),
+        destination: yup.object().required(msg.required),
+        from: yup.date().required(msg.required),
+        to: yup.date().required(msg.required),
         bookingDateTime: yup.date().notRequired(),
         bookingType: yup.string().notRequired()
     }),
     yup.object().shape({
-        seatNumber: yup.array().required("Required").min(1, "Must select at least 1 seat"),
+        seatNumber: yup.array().required(msg.required).min(1, msg.booking.minSeat),
     }),
     yup.object().shape({
-        pickUpAddress: yup.string().required("Required"),
-        firstName: yup.string().required("Required"),
-        lastName: yup.string().required("Required"),
+        pickUpAddress: yup.string().required(msg.required),
+        firstName: yup.string().required(msg.required),
+        lastName: yup.string().required(msg.required),
         phone: yup
             .string()
-            .matches(APP_CONSTANTS.PHONE_REGEX, "Invalid phone number")
-            .required("Required"),
+            .matches(APP_CONSTANTS.PHONE_REGEX, msg.common.phoneInvalid)
+            .required(msg.required),
         email: yup
             .string()
-            .required("Required")
-            .email("Invalid email"),
+            .required(msg.required)
+            .email(msg.common.emailInvalid),
         totalPayment: yup.number().notRequired(),
         paymentDateTime: yup.date().notRequired(),
-        paymentMethod: yup.string().required("Required"),
+        paymentMethod: yup.string().required(msg.required),
         paymentStatus: yup.string().notRequired(),
         nameOnCard: yup.string().when('paymentMethod', {
             is: 'CARD',
             then: () =>
-                yup.string().required("Required")
+                yup.string().required(msg.required)
             ,
             otherwise: () => yup.string().notRequired()
         }),
         cardNumber: yup.string().when('paymentMethod', {
             is: "CARD",
             then: () =>
-                yup.string().required('Required').matches(APP_CONSTANTS.VISA_REGEX, "Invalid Card Number e.g: '4111111111111'")
+                yup.string().required(msg.common.required).matches(APP_CONSTANTS.VISA_REGEX, msg.booking.cardInvalid)
             ,
             otherwise: () => yup.string().notRequired()
         }),
         expiredDate: yup.string().when('paymentMethod', {
             is: "CARD",
             then: () =>
-                yup.string().required('Required')
-                    .test('expiredDate', 'Invalid Expired Date e.g: MM/YY => 12/24', (value) => {
+                yup.string().required(msg.common.required)
+                    .test('expiredDate', msg.booking.expiredDate, (value) => {
                         const expirationDate = parse(value, 'MM/yy', new Date());
                         return isAfter(expirationDate, new Date());
                     })
@@ -59,8 +60,8 @@ export default [
         cvv: yup.string().when('paymentMethod', {
             is: "CARD",
             then: () =>
-                yup.string().required('Required')
-                    .test('len', 'Invalid CVV e.g: 123', (value) => value && value.length === 3)
+                yup.string().required(msg.common.required)
+                    .test('len', msg.booking.cvvInvalid, (value) => value && value.length === 3)
             ,
             otherwise: () => yup.string().notRequired()
         })

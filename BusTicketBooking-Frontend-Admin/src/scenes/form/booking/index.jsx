@@ -17,6 +17,7 @@ import { Formik } from "formik";
 import { LoadingButton } from "@mui/lab";
 import { handleToast } from "../../../utils/helpers";
 import { parse, format } from "date-fns";
+import { messages as msg } from "../../../utils/validationMessages";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -42,7 +43,7 @@ const BookingForm = () => {
     updateMutation.mutate(values, {
       onSuccess: (data) => {
         queryClient.setQueryData(["bookings", bookingId], data);
-        handleToast("success", "Update Booking successfully");
+        handleToast("success", msg.booking.updateSuccess);
       },
       onError: (error) => {
         console.log(error);
